@@ -1,10 +1,12 @@
 using Application.Images;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class ImageController : ControllerBase
 {
 
@@ -15,6 +17,12 @@ public class ImageController : ControllerBase
     {
         _logger = logger;
         _imageService = imageService;
+    }
+    
+    [HttpGet("/test")]
+    public async Task<IActionResult> TestAsync()
+    {
+        return Ok();
     }
 
     [HttpGet]
