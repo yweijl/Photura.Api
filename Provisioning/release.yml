@@ -1,23 +1,27 @@
+trigger: none
+
 name: Deploy Bicep files
 
 variables:
-  -group: "Photura"
-  azureServiceConnection: "$(Photura.azureServiceConnection)"
-  resourceGroupName: "$(Photura.resourceGroupName)"
-  location: "$(Photura.location)"
-  templateFile: "main.bicep"
+  - group: Photura
+  - name: templateFile
+    value: "Provisioning/main.bicep"
 
 pool:
-  vmImage: Default
+  name: Default
 
 steps:
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: 'pwd && ls && (if [ -f $(templateFile) ]; then echo "bicep $(templateFile) exists"; else echo "bicep not found"; fi)'
   - task: AzureCLI@2
     inputs:
       azureSubscription: $(azureServiceConnection)
       scriptType: bash
       scriptLocation: inlineScript
-      useGlobalConfig: false
+      useGlobalConfig: true
       inlineScript: |
         az --version
         az group create --name $(resourceGroupName) --location $(location)
-        az deployment group create --resource-group $(resourceGroupName) --template-file $(templateFile) --parameters location=$(Photura.location) storageName='photurasa'
+        az deployment group create --resource-group $(resourceGroupName) --template-file '$(templateFile)' --parameters location='$(location)' storageName='photurasa'
