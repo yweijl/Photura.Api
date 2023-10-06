@@ -1,0 +1,23 @@
+name: Deploy Bicep files
+
+variables:
+  -group: "Photura"
+  azureServiceConnection: "$(Photura.azureServiceConnection)"
+  resourceGroupName: "$(Photura.resourceGroupName)"
+  location: "$(Photura.location)"
+  templateFile: "main.bicep"
+
+pool:
+  vmImage: Default
+
+steps:
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: $(azureServiceConnection)
+      scriptType: bash
+      scriptLocation: inlineScript
+      useGlobalConfig: false
+      inlineScript: |
+        az --version
+        az group create --name $(resourceGroupName) --location $(location)
+        az deployment group create --resource-group $(resourceGroupName) --template-file $(templateFile) --parameters location=$(Photura.location) storageName='photurasa'

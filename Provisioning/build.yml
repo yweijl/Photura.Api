@@ -1,0 +1,24 @@
+trigger:
+  - main
+
+name: Build App
+
+pool:
+  name: Default
+
+steps:
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: "build"
+      projects: "**/*.csproj"
+      arguments: "--configuration Release"
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: "publish"
+      publishWebProjects: true
+      arguments: "--configuration Release --output $(Build.ArtifactStagingDirectory)/publish"
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: "$(Build.ArtifactStagingDirectory)/publish"
+      artifact: "Drop"
+      publishLocation: "pipeline"

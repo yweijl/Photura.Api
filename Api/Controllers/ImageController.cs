@@ -18,7 +18,7 @@ public class ImageController : ControllerBase
         _logger = logger;
         _imageService = imageService;
     }
-    
+
     [HttpGet("/test")]
     public async Task<IActionResult> TestAsync()
     {
