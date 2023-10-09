@@ -30,3 +30,5 @@ module appService 'Modules/appService.bicep' = {
     tags: tags
   }
 }
+
+output appName string = appService.name
