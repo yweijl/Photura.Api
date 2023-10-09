@@ -3,18 +3,17 @@ trigger: none
 name: Deploy Bicep files
 
 variables:
-  - group: Photura
+  - group: PipeLib
   - name: templateFile
-    value: "Provisioning/main.bicep"
+    value: "Provisioning/Bicep/main.bicep"
+  - name: paramFile
+    value: Provisioning/Bicep/parameters.bicepparam
+  - template: vars.yml
 
 pool:
   name: Default
 
 steps:
-  - task: Bash@3
-    inputs:
-      targetType: 'inline'
-      script: 'pwd && ls && (if [ -f $(templateFile) ]; then echo "bicep $(templateFile) exists"; else echo "bicep not found"; fi)'
   - task: AzureCLI@2
     inputs:
       azureSubscription: $(azureServiceConnection)
@@ -23,5 +22,12 @@ steps:
       useGlobalConfig: true
       inlineScript: |
         az --version
-        az group create --name $(resourceGroupName) --location $(location)
-        az deployment group create --resource-group $(resourceGroupName) --template-file '$(templateFile)' --parameters location='$(location)' storageName='photurasa'
+        az group create --name ${{variables.name}}-rg --location $(location)
+        az stack group create \
+          --name ${{variables.name}}-stack \
+          --resource-group ${{variables.name}}-rg \
+          --template-file $(templateFile) \
+          --parameters $(paramFile) \
+          --deny-settings-mode none \
+          --delete-resources \
+          --delete-resource-groups
